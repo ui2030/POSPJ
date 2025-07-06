@@ -12,7 +12,7 @@ public class DBConnect {
     private static String password;
 
     static {
-        try (InputStream input = DBConnect.class.getClassLoader().getResourceAsStream("pos.properties")) {
+        try (InputStream input = DBConnect.class.getClassLoader().getResourceAsStream("properties")) {
             Properties prop = new Properties();
             prop.load(input);
 

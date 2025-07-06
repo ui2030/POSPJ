@@ -5,4 +5,5 @@ db.username=c##pos
 db.password=1234
 
 # SendGrid API
-sendgrid.api.key=SG.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+String apiKey = PropertiesLoader.get("sendgrid.api.key");
+String fromEmail = PropertiesLoader.get("sendgrid.sender.email");

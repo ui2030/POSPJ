@@ -1,15 +1,17 @@
 package pos.controller;
 
 import com.sendgrid.*;
+import pos.model.POSUser;
 import pos.util.DBConnect;
-import pos.util.EmailSender;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Properties;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -33,8 +35,23 @@ public class SignUp {
         // 인증 코드 생성
         String code = generateCode();
 
+        // SendGrid 키, 이메일 불러오기
+        String apiKey = null;
+        String fromEmail = null;
+
+        Properties prop = new Properties();
+        try (InputStream input = SignUp.class.getClassLoader().getResourceAsStream("pos.properties")) {
+            prop.load(input);
+            apiKey = prop.getProperty("sendgrid.api.key");
+            fromEmail = prop.getProperty("sendgrid.sender.email");
+        } catch (IOException e) {
+            System.out.println("properties 파일 로딩 실패");
+            e.printStackTrace();
+            return;
+        }
+
         // 이메일 전송
-        boolean sent = sendCodeToEmail(email, code);
+        boolean sent = sendCodeToEmail(email, code, apiKey, fromEmail);
         if (!sent) {
             System.out.println("이메일 전송 실패. 회원가입 중단.");
             return;
@@ -49,7 +66,6 @@ public class SignUp {
 
         // 랜덤 회원 식별코드 생성
         String memberCode = generateMemberCode();
-
         String date = LocalDate.now().toString();
         String time = LocalTime.now().withNano(0).toString();
 
@@ -77,33 +93,7 @@ public class SignUp {
         }
     }
 
-    // 인증 코드 생성 (영문 + 숫자 혼합 5자리)
-    private static String generateCode() {
-        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        Random random = new Random();
-        StringBuilder code = new StringBuilder();
-        for (int i = 0; i < 5; i++) {
-            code.append(chars.charAt(random.nextInt(chars.length())));
-        }
-        return code.toString();
-    }
-
-    // 회원 고유 식별자 생성 (영문 5자리)
-    private static String generateMemberCode() {
-        String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        Random r = new Random();
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < 5; i++) {
-            sb.append(alphabet.charAt(r.nextInt(alphabet.length())));
-        }
-        return sb.toString();
-    }
-
-    // SendGrid로 이메일 전송
-    private static boolean sendCodeToEmail(String toEmail, String code) {
-        String apiKey = PropertiesLoader.get("sendgrid.api.key");
-        String fromEmail = PropertiesLoader.get("sendgrid.sender.email");
-
+    private static boolean sendCodeToEmail(String toEmail, String code, String apiKey, String fromEmail) {
         Email from = new Email(fromEmail);
         Email to = new Email(toEmail);
         String subject = "POS 시스템 인증 코드";
@@ -126,5 +116,25 @@ public class SignUp {
             e.printStackTrace();
             return false;
         }
+    }
+
+    private static String generateCode() {
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        Random random = new Random();
+        StringBuilder code = new StringBuilder();
+        for (int i = 0; i < 5; i++) {
+            code.append(chars.charAt(random.nextInt(chars.length())));
+        }
+        return code.toString();
+    }
+
+    private static String generateMemberCode() {
+        String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        Random r = new Random();
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 5; i++) {
+            sb.append(alphabet.charAt(r.nextInt(alphabet.length())));
+        }
+        return sb.toString();
     }
 }
