@@ -7,5 +7,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="sendgrid-java" level="project" />
+    <orderEntry type="library" name="ojdbc17" level="project" />
   </component>
 </module>
