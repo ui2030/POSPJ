@@ -4,6 +4,8 @@ db.url=jdbc:oracle:thin:@10.10.108.133:1521:xe
 db.username=c##pos
 db.password=1234
 
-# SendGrid API
-String apiKey = PropertiesLoader.get("sendgrid.api.key");
-String fromEmail = PropertiesLoader.get("sendgrid.sender.email");
+aws.ses.username=AKIATZMXLFIRR2DL673P
+aws.ses.password=BEyVIJDSLdq+dak77FuImfa32Kj6O2dVe4PexOdSk+R3
+aws.ses.host=email-smtp.ap-southeast-2.amazonaws.com
+aws.ses.port=587
+aws.ses.sender.email=cjsdml1234@gmail.com

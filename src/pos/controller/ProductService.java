@@ -27,15 +27,20 @@ public class ProductService {
         System.out.println("가격을 입력하세요:");
         int price = Integer.parseInt(sc.nextLine());
 
-        System.out.println("개수를 입력하세요:");
-        int count = Integer.parseInt(sc.nextLine());
+        int count;
+        while (true) {
+            System.out.println("개수를 입력하세요 (최소 10개 이상):");
+            count = Integer.parseInt(sc.nextLine());
+            if (count >= 10) break;
+            System.out.println("10개 이상만 등록할 수 있습니다.");
+        }
 
         System.out.println("19금 제품인가요? (Y/N):");
         String isAdult = sc.nextLine();
 
-        boolean is19 = isAdult.equalsIgnoreCase("Y");
+        boolean age19 = isAdult.equalsIgnoreCase("Y");
 
-        String sql = is19
+        String sql = age19
                 ? """
                     INSERT INTO Product19(product_id19, product_name19, product_count19, manu_facturer19,
                         best_before19, best_beforetime19, price19, log_id, login_member)
@@ -157,8 +162,6 @@ public class ProductService {
         Scanner sc = new Scanner(System.in);
         System.out.print("검색할 제품명을 입력하세요: ");
         String keyword = sc.nextLine();
-
-        String likeKeyword = "%'" + keyword + "'%";
 
         try (Connection conn = DBConnect.getConnection()) {
             System.out.println("\n일반 제품 검색 결과:");

@@ -1,25 +1,22 @@
 package pos.controller;
 
-import com.sendgrid.*;
-import pos.model.POSUser;
-import pos.util.DBConnect;
-
-import java.io.IOException;
-import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Properties;
 import java.util.Random;
 import java.util.Scanner;
+
+import pos.util.DBConnect;
+import pos.util.EmailSender;
 
 public class SignUp {
 
     public static void registerUser() {
         Scanner sc = new Scanner(System.in);
 
+        System.out.println("[회원가입을 진행합니다]");
         System.out.print("이름: ");
         String name = sc.nextLine();
 
@@ -29,111 +26,66 @@ public class SignUp {
         System.out.print("비밀번호: ");
         String pw = sc.nextLine();
 
-        System.out.print("구글 이메일 입력 (인증용): ");
+        System.out.print("이메일 주소(Gmail): ");
         String email = sc.nextLine();
 
         // 인증 코드 생성
         String code = generateCode();
 
-        // SendGrid 키, 이메일 불러오기
-        String apiKey = null;
-        String fromEmail = null;
-
-        Properties prop = new Properties();
-        try (InputStream input = SignUp.class.getClassLoader().getResourceAsStream("pos.properties")) {
-            prop.load(input);
-            apiKey = prop.getProperty("sendgrid.api.key");
-            fromEmail = prop.getProperty("sendgrid.sender.email");
-        } catch (IOException e) {
-            System.out.println("properties 파일 로딩 실패");
-            e.printStackTrace();
+        // 이메일 발송
+        boolean result = EmailSender.sendCode(email, code);
+        if (!result) {
+            System.out.println("이메일 발송 실패로 회원가입을 중단합니다.");
             return;
         }
 
-        // 이메일 전송
-        boolean sent = sendCodeToEmail(email, code, apiKey, fromEmail);
-        if (!sent) {
-            System.out.println("이메일 전송 실패. 회원가입 중단.");
+        System.out.print("전송된 인증 코드를 입력하세요: ");
+        String userInputCode = sc.nextLine();
+        if (!userInputCode.equals(code)) {
+            System.out.println("인증 실패. 회원가입을 중단합니다.");
             return;
         }
 
-        System.out.print("이메일로 전송된 코드 입력: ");
-        String inputCode = sc.nextLine();
-        if (!inputCode.equals(code)) {
-            System.out.println("인증 실패. 코드 불일치.");
-            return;
-        }
+        // 랜덤 사원코드 생성
+        String loginMember = generateMemberCode();
+        String todayDate = LocalDate.now().toString();
+        String todayTime = LocalTime.now().withNano(0).toString();
 
-        // 랜덤 회원 식별코드 생성
-        String memberCode = generateMemberCode();
-        String date = LocalDate.now().toString();
-        String time = LocalTime.now().withNano(0).toString();
-
-        String sql = """
-            INSERT INTO POSUser(login_member, login_id, login_password, login_name, todays_date, todays_time)
-            VALUES (?, ?, ?, ?, ?, ?)
-        """;
-
-        try (Connection conn = DBConnect.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            pstmt.setString(1, memberCode);
-            pstmt.setString(2, id);
-            pstmt.setString(3, pw);
-            pstmt.setString(4, name);
-            pstmt.setString(5, date);
-            pstmt.setString(6, time);
-
-            int row = pstmt.executeUpdate();
-            System.out.printf("회원가입 성공! 등록된 사용자 수: %d명\n", row);
-
+        try (Connection conn = DBConnect.getConnection()) {
+            String sql = "INSERT INTO POSUser (login_member, login_id, login_password, login_name, todays_date, todays_time) " +
+                    "VALUES (?, ?, ?, ?, ?, ?)";
+            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setString(1, loginMember);
+                pstmt.setString(2, id);
+                pstmt.setString(3, pw);
+                pstmt.setString(4, name);
+                pstmt.setString(5, todayDate);
+                pstmt.setString(6, todayTime);
+                pstmt.executeUpdate();
+                System.out.println("회원 가입이 완료되었습니다. 로그인 창으로 돌아갑니다.");
+            }
         } catch (SQLException e) {
-            System.out.println("회원가입 중 오류 발생");
+            System.out.println("회원 정보 저장 중 오류 발생");
             e.printStackTrace();
-        }
-    }
-
-    private static boolean sendCodeToEmail(String toEmail, String code, String apiKey, String fromEmail) {
-        Email from = new Email(fromEmail);
-        Email to = new Email(toEmail);
-        String subject = "POS 시스템 인증 코드";
-        Content content = new Content("text/plain", "인증 코드: " + code);
-        Mail mail = new Mail(from, subject, to, content);
-
-        SendGrid sg = new SendGrid(apiKey);
-        Request request = new Request();
-
-        try {
-            request.setMethod(Method.POST);
-            request.setEndpoint("mail/send");
-            request.setBody(mail.build());
-
-            Response response = sg.api(request);
-            return response.getStatusCode() == 202;
-
-        } catch (IOException e) {
-            System.out.println("이메일 전송 중 오류 발생");
-            e.printStackTrace();
-            return false;
         }
     }
 
     private static String generateCode() {
         String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        Random random = new Random();
-        StringBuilder code = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
+        Random rand = new Random();
         for (int i = 0; i < 5; i++) {
-            code.append(chars.charAt(random.nextInt(chars.length())));
+            sb.append(chars.charAt(rand.nextInt(chars.length())));
         }
-        return code.toString();
+        return sb.toString();
     }
 
     private static String generateMemberCode() {
-        String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        Random r = new Random();
+        String letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         StringBuilder sb = new StringBuilder();
+        Random rand = new Random();
         for (int i = 0; i < 5; i++) {
-            sb.append(alphabet.charAt(r.nextInt(alphabet.length())));
+            sb.append(letters.charAt(rand.nextInt(letters.length())));
         }
         return sb.toString();
     }
