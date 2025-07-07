@@ -6,54 +6,66 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Scanner;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 public class SalesService {
 
-    // 1. 날짜별 매출 조회
+    // 날짜별 매출 조회
     public static void querySalesByDate() {
-        Scanner sc = new Scanner(System.in);
-        System.out.print("조회할 날짜를 입력하세요 (예: 2025-07-07): ");
-        String date = sc.nextLine();
+        try (Connection conn = DBConnect.getConnection()) {
+            String sql = "SELECT money_date, SUM(sales) AS total_sales FROM POSSales GROUP BY money_date ORDER BY money_date";
 
-        String sql = "SELECT SUM(sales) AS total_sales FROM POSSales WHERE money_date = ?";
+            try (PreparedStatement pstmt = conn.prepareStatement(sql);
+                 ResultSet rs = pstmt.executeQuery()) {
 
-        try (Connection conn = DBConnect.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            pstmt.setString(1, date);
-            ResultSet rs = pstmt.executeQuery();
-
-            if (rs.next()) {
-                int total = rs.getInt("total_sales");
-                System.out.printf("%s 날짜의 총 매출은 %,d원입니다.%n", date, total);
-            } else {
-                System.out.println("해당 날짜의 매출 정보가 없습니다.");
+                System.out.println("\n===== 날짜별 매출 정보 =====");
+                while (rs.next()) {
+                    String date = rs.getString("money_date");
+                    int total = rs.getInt("total_sales");
+                    System.out.printf("%s : %,d원\n", date, total);
+                }
             }
-
         } catch (SQLException e) {
             System.out.println("매출 조회 중 오류 발생");
             e.printStackTrace();
         }
     }
 
-    // 2. 일당 차감
+    // 근무 시간 후 시급 계산 및 POS 잔고 차감
     public static boolean deductWage(String loginMember, int wage) {
-        String sql = "UPDATE POSSales SET balance = balance - ? WHERE pos_id = (SELECT MAX(pos_id) FROM POSSales WHERE login_member = ?)";
+        try (Connection conn = DBConnect.getConnection()) {
+            int balance = getCurrentBalance(conn);
+            int newBalance = balance - wage;
 
-        try (Connection conn = DBConnect.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            String sql = "INSERT INTO POSSales(pos_id, balance, sales, money_date, money_time, product_id, product_id19, log_id, login_member)\n" +
+                    "VALUES (possales_seq.NEXTVAL, ?, ?, ?, ?, NULL, NULL, NULL, ?)";
 
-            pstmt.setInt(1, wage);
-            pstmt.setString(2, loginMember);
+            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setInt(1, newBalance);
+                pstmt.setInt(2, -wage); // sales에 음수로 저장 (지출)
+                pstmt.setString(3, LocalDate.now().toString());
+                pstmt.setString(4, LocalTime.now().withNano(0).toString());
+                pstmt.setString(5, loginMember);
 
-            int row = pstmt.executeUpdate();
-            return row > 0;
-
+                int row = pstmt.executeUpdate();
+                return row > 0;
+            }
         } catch (SQLException e) {
-            System.out.println("일당 차감 중 오류 발생");
+            System.out.println("POS 잔고 차감 처리 중 오류 발생");
             e.printStackTrace();
-            return false;
         }
+        return false;
+    }
+
+    private static int getCurrentBalance(Connection conn) throws SQLException {
+        String sql = "SELECT balance FROM POSSales ORDER BY pos_id DESC FETCH FIRST 1 ROWS ONLY";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt("balance");
+            }
+        }
+        return 1234000;
     }
 }

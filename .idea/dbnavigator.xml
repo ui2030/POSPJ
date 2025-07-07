@@ -26,6 +26,8 @@
     <connection id="b8e7ea97-a1d6-4786-a6e6-bbd91212bab8">
       <console name="Connection" type="STANDARD" schema="C##POS" session="Main"><![CDATA[-- 시퀀스 생성 (없을 경우)
 CREATE SEQUENCE product_seq START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
+CREATE SEQUENCE possales_seq START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
+CREATE SEQUENCE loginlog_seq  START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
 
 -- 샘플 데이터 10개 삽입
 INSERT INTO Product (
@@ -44,7 +46,37 @@ INSERT INTO Product VALUES (product_seq.NEXTVAL, '과자', 80, '오리온', '202
 INSERT INTO Product VALUES (product_seq.NEXTVAL, '삼각김밥', 60, 'GS25', '2025-07-09', '11:00:00', 1300, 1, 'ABCDE');
 
 ALTER TABLE POSSales MODIFY product_id NULL;
-ALTER TABLE POSSales MODIFY product_id19 NULL;]]></console>
+ALTER TABLE POSSales MODIFY product_id19 NULL;
+
+ALTER TABLE PRODUCT MODIFY product_id NULL;
+ALTER TABLE PRODUCT19 MODIFY product_id19 NULL;
+
+drop sequence LOGINLOG_SEQ;
+drop sequence POSSALES_SEQ;
+drop sequence PRODUCT_SEQ;
+
+drop table LOGINLOG;
+drop table POSSALES;
+drop table PRODUCT19
+drop table PRODUCT
+
+INSERT INTO POSUser (
+    login_member,
+    login_id,
+    login_password,
+    login_name,
+    todays_date,
+    todays_time
+) VALUES (
+    'ABCDE',
+    'ui2030',
+    '1234',
+    '김천의',
+    '2025-07-07',
+    '12:05:00'
+)
+
+TRUNCATE TABLE POSSALES;]]></console>
     </connection>
   </component>
   <component name="DBNavigator.Project.DatabaseEditorStateManager">
@@ -66,6 +98,9 @@ ALTER TABLE POSSales MODIFY product_id19 NULL;]]></console>
   </component>
   <component name="DBNavigator.Project.ExecutionManager">
     <retain-sticky-names value="false" />
+  </component>
+  <component name="DBNavigator.Project.ObjectDependencyManager">
+    <last-used-dependency-type value="INCOMING" />
   </component>
   <component name="DBNavigator.Project.ObjectQuickFilterManager">
     <last-used-operator value="EQUAL" />
