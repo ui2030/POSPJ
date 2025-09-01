@@ -39,3 +39,15 @@ POSPJ – 콘솔 기반 POS 시스템 (Java)
 매출 조회
 
 일자별/기간별 매출 합계 조회
+
+
+
+기술 스택
+
+Language: Java (권장 JDK 17+)
+
+DB: JDBC 호환(Oracle/MySQL 등)
+
+IDE: IntelliJ IDEA (프로젝트 파일: POSPJ.iml)
+
+구조: 콘솔 기반 MVC-ish(dao/service/model/util 패키지 권장)
