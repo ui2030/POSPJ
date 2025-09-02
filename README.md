@@ -91,7 +91,7 @@ java -cp out pos.Main   # 🔧 실제 메인 클래스 경로로 교체
 ## DB 스키마 예시
 
 실제 테이블은 프로젝트 SQL 스크립트/DAO 구현과 맞추어 적용하세요.
-```
+```sql
 CREATE TABLE POSUser (
 --사원식별코드, 아이디, 비밀번호, 이름, 생성날짜, 시간
 login_member   VARCHAR2(10) NOT NULL,
@@ -165,6 +165,61 @@ FOREIGN KEY (log_id, login_member) REFERENCES Loginlog(log_id, login_member),
 FOREIGN KEY (product_id) REFERENCES Product(product_id),
 FOREIGN KEY (product_id19) REFERENCES Product19(product_id19)
 );
+```
+### 샘플데이터
+```sql
+-- 샘플 데이터 10개 삽입 (일반 상품)
+INSERT INTO Product (
+    product_id, product_name, product_count, manu_facturer,
+    best_before, best_beforetime, price, log_id, login_member
+) VALUES (product_seq.NEXTVAL, '빵', 30, '삼립', '2025-12-31', '12:00:00', 2000, 1, 'ABCDE');
+
+INSERT INTO Product VALUES (product_seq.NEXTVAL, '우유', 25, '서울우유', '2025-12-30', '10:00:00', 1800, 1, 'ABCDE');
+INSERT INTO Product VALUES (product_seq.NEXTVAL, '계란', 50, 'CJ', '2025-12-20', '08:00:00', 3000, 1, 'ABCDE');
+INSERT INTO Product VALUES (product_seq.NEXTVAL, '바나나', 20, '돌', '2025-07-15', '09:00:00', 2500, 1, 'ABCDE');
+INSERT INTO Product VALUES (product_seq.NEXTVAL, '두부', 40, '풀무원', '2025-07-10', '07:00:00', 1500, 1, 'ABCDE');
+INSERT INTO Product VALUES (product_seq.NEXTVAL, '라면', 100, '농심', '2026-01-01', '00:00:00', 900, 1, 'ABCDE');
+INSERT INTO Product VALUES (product_seq.NEXTVAL, '콜라', 50, '코카콜라', '2026-03-15', '14:00:00', 1700, 1, 'ABCDE');
+INSERT INTO Product VALUES (product_seq.NEXTVAL, '사이다', 45, '롯데칠성', '2026-03-20', '14:30:00', 1600, 1, 'ABCDE');
+INSERT INTO Product VALUES (product_seq.NEXTVAL, '과자', 80, '오리온', '2026-05-05', '13:00:00', 1200, 1, 'ABCDE');
+INSERT INTO Product VALUES (product_seq.NEXTVAL, '삼각김밥', 60, 'GS25', '2025-07-09', '11:00:00', 1300, 1, 'ABCDE');
+
+-- 샘플 데이터 5개 삽입 (19세 상품)
+
+INSERT INTO Product19 VALUES (product_seq.NEXTVAL, '처음처럼', 20, '롯데주류', '2026-01-01', '18:00:00', 2000, 1, 'ABCDE');
+INSERT INTO Product19 VALUES (product_seq.NEXTVAL, '하이트 맥주', 30, '하이트진로', '2026-02-15', '19:00:00', 2500, 1, 'ABCDE');
+INSERT INTO Product19 VALUES (product_seq.NEXTVAL, '말보로 레드', 15, '필립모리스', '2026-12-31', '23:59:00', 5000, 1, 'ABCDE');
+INSERT INTO Product19 VALUES (product_seq.NEXTVAL, '던힐 블루', 10, 'BAT코리아', '2026-12-31', '23:59:00', 4800, 1, 'ABCDE');
+INSERT INTO Product19 VALUES (product_seq.NEXTVAL, '참이슬 후레쉬', 25, '하이트진로', '2026-03-01', '18:30:00', 2100, 1, 'ABCDE');
+```
+### 시퀸스 및 유저 샘플 데이터
+```sql
+CREATE SEQUENCE product_seq START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
+CREATE SEQUENCE possales_seq START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
+CREATE SEQUENCE loginlog_seq  START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
+-- 시퀸스 
+
+CREATE SEQUENCE product_seq
+START WITH 1        -- 시작값
+INCREMENT BY 1      -- 1씩 증가
+NOCACHE             -- 캐싱 안 함 (원하면 CACHE 20 가능)
+NOCYCLE;            -- 9999999999 도달해도 반복 안 함
+
+INSERT INTO POSUser (
+    login_member,
+    login_id,
+    login_password,
+    login_name,
+    todays_date,
+    todays_time
+) VALUES (
+    'ABCDE',
+    'ui2030',
+    '1234',
+    '김천의',
+    '2025-07-07',
+    '12:05:00'
+)
 ```
 
 ## 사용 흐름(예)
