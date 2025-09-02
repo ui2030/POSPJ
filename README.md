@@ -38,11 +38,11 @@
 
 ## 기술 스택
 
-Language: Java (권장 JDK 17+)
+**ㆍ**Language: Java (권장 JDK 17+)
 
-DB: JDBC 호환 DB (Oracle/MySQL 등 선택)
+**ㆍ**DB: JDBC 호환 DB (Oracle/MySQL 등 선택)
 
-IDE: IntelliJ IDEA (POSPJ.iml 포함)
+**ㆍ**IDE: IntelliJ IDEA (POSPJ.iml 포함)
 
 ## 폴더 구조
 ```css
