@@ -48,7 +48,7 @@ IDE: IntelliJ IDEA (POSPJ.iml 포함)
 GitHub
 
 폴더 구조
-'''css
+```css
 POSPJ/
 ├─ .idea/
 ├─ src/
@@ -56,7 +56,7 @@ POSPJ/
 ├─ .gitignore
 ├─ POSPJ.iml
 └─ README.md
-'''
+```
 
 저장소 루트에 src/pos, .idea, .gitignore, POSPJ.iml, README.md가 있습니다. 
 GitHub
