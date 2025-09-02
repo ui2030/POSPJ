@@ -48,11 +48,11 @@ IDE: IntelliJ IDEA (POSPJ.iml 포함)
 GitHub
 
 폴더 구조
-'''cs
+'''css
 POSPJ/
 ├─ .idea/
 ├─ src/
-│  └─ pos/            # 도메인 코드 (model/dao/service/util/Main 등)
+│  └─ pos/
 ├─ .gitignore
 ├─ POSPJ.iml
 └─ README.md
