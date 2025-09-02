@@ -212,4 +212,5 @@ boolean isAdult(LocalDate birth, LocalDate today) {
 ## 참고
  
 **ㆍ** README에 있는 시연 영상은 (YouTube) 링크가 포함되어 있습니다.
+
 **ㆍ** 프론트 & DB 시연은 2배속이 걸려있습니다.
