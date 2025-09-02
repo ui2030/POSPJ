@@ -89,8 +89,6 @@ javac -encoding UTF-8 -d out $(git ls-files "src/**/*.java")
 java -cp out pos.Main   # 🔧 실제 메인 클래스 경로로 교체
 ```
 ## DB 스키마 예시
-
-실제 테이블은 프로젝트 SQL 스크립트/DAO 구현과 맞추어 적용하세요.
 ```sql
 CREATE TABLE POSUser (
 --사원식별코드, 아이디, 비밀번호, 이름, 생성날짜, 시간
