@@ -44,7 +44,7 @@ DB: JDBC 호환 DB (Oracle/MySQL 등 선택)
 
 IDE: IntelliJ IDEA (POSPJ.iml 포함)
 
-폴더 구조
+## 폴더 구조
 ```css
 POSPJ/
 ├─ .idea/
@@ -57,14 +57,15 @@ POSPJ/
 
 저장소 루트에 src/pos, .idea, .gitignore, POSPJ.iml, README.md가 있습니다. 
 
-빠른 실행
-1) 사전 준비
+## 빠른 실행
+### 1) 사전 준비
 
-JDK 17+ 설치
+**ㆍ**JDK 17+ 설치
 
-Oracle/MySQL 등 DB 준비 및 JDBC 드라이버 추가
+**ㆍ**Oracle/MySQL 등 DB 준비 및 JDBC 드라이버 추가
 
-2) 환경 변수/설정 (예시)
+
+### 2) 환경 변수/설정 (예시)
 
 src/pos/util/DBConnect.java 또는 설정 파일에 아래와 같이 입력합니다.
 (클래스/경로명은 실제 코드에 맞게 수정)
@@ -77,102 +78,133 @@ WAGE_PER_HOUR=11000
 BLOCK_EXPIRED_ITEMS=true
 ADULT_CHECK_ENABLED=true
 ```
-3) 빌드 & 실행
+## 3) 빌드 & 실행
 
-IntelliJ: Main 클래스 실행
+**ㆍ**IntelliJ: Main 클래스 실행
 
-CLI(예시):
-
+**ㆍ**CLI(예시):
+```
 # 프로젝트 루트에서
 javac -encoding UTF-8 -d out $(git ls-files "src/**/*.java")
 java -cp out pos.Main   # 🔧 실제 메인 클래스 경로로 교체
-
-DB 스키마 예시
+```
+## DB 스키마 예시
 
 실제 테이블은 프로젝트 SQL 스크립트/DAO 구현과 맞추어 적용하세요.
+```
+CREATE TABLE POSUser (
+--사원식별코드, 아이디, 비밀번호, 이름, 생성날짜, 시간
+login_member   VARCHAR2(10) NOT NULL,
+login_id       VARCHAR2(10) NOT NULL,
+login_password VARCHAR2(30) NOT NULL,
+login_name     VARCHAR2(20) NOT NULL,
+todays_date    VARCHAR2(10) NOT NULL,
+todays_time     VARCHAR2(8) NOT NULL,
 
-CREATE TABLE products (
-  product_id     BIGINT PRIMARY KEY,
-  name           VARCHAR(100) NOT NULL,
-  manufacturer   VARCHAR(100),
-  price          INT NOT NULL,
-  is_adult_only  CHAR(1) DEFAULT 'N',   -- 'Y' or 'N'
-  expire_date    DATE,
-  stock_qty      INT DEFAULT 0
+PRIMARY KEY (login_member)
 );
 
-CREATE TABLE sales (
-  sale_id      BIGINT PRIMARY KEY,
-  sale_date    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  total_amount INT NOT NULL
+CREATE TABLE Loginlog (
+--로그식별번호, 로그인 날짜, 시간, 이름, 회원식별코드
+log_id         NUMBER(10) NOT NULL,
+ml_date      VARCHAR2(10) NOT NULL,
+ml_time       VARCHAR2(8) NOT NULL,
+ml_name      VARCHAR2(20) NOT NULL,
+login_member VARCHAR2(10) NOT NULL,
+
+PRIMARY KEY (log_id, login_member),
+FOREIGN KEY (login_member) REFERENCES POSUser(login_member)
 );
 
-CREATE TABLE sale_items (
-  sale_item_id BIGINT PRIMARY KEY,
-  sale_id      BIGINT REFERENCES sales(sale_id),
-  product_id   BIGINT REFERENCES products(product_id),
-  qty          INT NOT NULL,
-  line_amount  INT NOT NULL
+CREATE TABLE Product (
+--제품식별번호, 제품명, 개수, 제조회사, 유통기한날짜, 유통기한시간, 가격, (로그, 사원 식별번호)
+product_id       NUMBER(10) NOT NULL,
+product_name   VARCHAR2(40) NOT NULL,
+product_count    NUMBER(10),
+manu_facturer  VARCHAR2(40) NOT NULL,
+best_before    VARCHAR2(10) NOT NULL,
+best_beforetime VARCHAR2(8) NOT NULL,
+price            NUMBER(20) NOT NULL,
+log_id           NUMBER(20) NOT NULL,
+login_member   VARCHAR2(10) NOT NULL,
+
+PRIMARY KEY (product_id),
+FOREIGN KEY (log_id, login_member) REFERENCES Loginlog(log_id, login_member)
 );
 
-CREATE TABLE employees (
-  emp_id     BIGINT PRIMARY KEY,
-  login_id   VARCHAR(50) UNIQUE NOT NULL,
-  name       VARCHAR(50) NOT NULL,
-  password   VARCHAR(200) NOT NULL
+CREATE TABLE Product19 (
+--제품식별번호, 제품명, 개수, 제조회사, 유통기한, 시간, 가격, (로그, 사원 식별번호)
+product_id19        NUMBER(10) NOT NULL,
+product_name19    VARCHAR2(40) NOT NULL,
+product_count19     NUMBER(10),
+manu_facturer19   VARCHAR2(40) NOT NULL,
+best_before19     VARCHAR2(10) NOT NULL,
+best_beforetime19  VARCHAR2(8) NOT NULL,
+price19             NUMBER(20) NOT NULL,
+log_id              NUMBER(20) NOT NULL,
+login_member      VARCHAR2(10) NOT NULL,
+
+PRIMARY KEY (product_id19),
+FOREIGN KEY (log_id, login_member) REFERENCES Loginlog(log_id, login_member)
 );
 
-CREATE TABLE work_logs (
-  work_id     BIGINT PRIMARY KEY,
-  emp_id      BIGINT REFERENCES employees(emp_id),
-  start_time  TIMESTAMP,
-  end_time    TIMESTAMP,
-  worked_sec  INT
+CREATE TABLE POSSales (
+--POS기식별번호, 잔액, 매출, 날짜, 시간, (제품, 로그, 사원 식별번호)
+pos_id         NUMBER(10) NOT NULL,
+balance        NUMBER(20) DEFAULT 1234000,
+sales          NUMBER(20) DEFAULT 0,
+money_date     VARCHAR2(10) NOT NULL,
+money_time     VARCHAR2(8) NOT NULL,
+product_id     NUMBER(10),
+product_id19   NUMBER(10),
+log_id         NUMBER(10),
+login_member   VARCHAR2(10) NOT NULL,
+
+PRIMARY KEY (pos_id, log_id, login_member),
+FOREIGN KEY (log_id, login_member) REFERENCES Loginlog(log_id, login_member),
+FOREIGN KEY (product_id) REFERENCES Product(product_id),
+FOREIGN KEY (product_id19) REFERENCES Product19(product_id19)
 );
+```
 
-CREATE TABLE pos_balance (
-  id          INT PRIMARY KEY,
-  cash_amount INT DEFAULT 0,
-  card_amount INT DEFAULT 0
-);
+## 사용 흐름(예)
 
-사용 흐름(예)
+**1.** 직원 로그인 → 근무 시작
 
-직원 로그인 → 근무 시작
+**2.** 상품 등록/검색, 입고 → 재고 확인
 
-상품 등록/검색, 입고 → 재고 확인
+**3.** 장바구니 → 결제(현금/카드) → 잔고 반영
 
-장바구니 → 결제(현금/카드) → 잔고 반영
+**4.** 매출 조회(일/기간)
 
-매출 조회(일/기간)
+**5.** 근무 종료 → 근무시간 × 시급 = 일급 정산
 
-근무 종료 → 근무시간 × 시급 = 일급 정산
-
-성인 판별 로직(예)
+## 성인 판별 로직(예)
+```
 boolean isAdult(LocalDate birth, LocalDate today) {
     return Period.between(birth, today).getYears() >= 19;
 }
+```
+## 로드맵
 
-로드맵
+ **ㆍ**단위/통합 테스트(JUnit)
 
- 단위/통합 테스트(JUnit)
+ **ㆍ**매출 통계(베스트/시간대)
 
- 매출 통계(베스트/시간대)
+ **ㆍ**영수증 출력(파일/프린터)
 
- 영수증 출력(파일/프린터)
+ **ㆍ**CSV/Excel 입출력
 
- CSV/Excel 입출력
+ **ㆍ**(선택) 간단한 관리자 메뉴/권한
 
- (선택) 간단한 관리자 메뉴/권한
-
-기여
+## 기여
 
 이슈·PR 환영합니다. 버그/개선 제안은 Issues에 등록해 주세요.
 
-라이선스 & 연락처
+## 라이선스 & 연락처
 
-🔧 라이선스: MIT 등 원하는 라이선스를 LICENSE로 추가
+**ㆍ**🔧 라이선스: MIT 등 원하는 라이선스를 LICENSE로 추가
 
-🔧 Maintainer: 이름 / 이메일
+**ㆍ**🔧 Maintainer: Cheonui Kim / kimcjsdml@gmail.com
 
-저장소: https://github.com/ui2030/POSPJ
+**ㆍ**저장소: (https://github.com/ui2030/POSPJ)
