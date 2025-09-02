@@ -6,6 +6,7 @@ POSPJ – 콘솔 기반 POS 시스템 (Java)
 🔧 시연 영상·포트폴리오 링크 :
 
 [프론트 & DB 시연](https://youtu.be/4ozVGK_rUEI)
+
 [회원가입 생성 시연](https://youtu.be/_yvdUsxaZK4)
 
 핵심 기능
@@ -44,9 +45,6 @@ DB: JDBC 호환 DB (Oracle/MySQL 등 선택)
 
 IDE: IntelliJ IDEA (POSPJ.iml 포함)
 
-저장소 언어 통계는 Java가 100%입니다. 
-GitHub
-
 폴더 구조
 ```css
 POSPJ/
@@ -59,20 +57,19 @@ POSPJ/
 ```
 
 저장소 루트에 src/pos, .idea, .gitignore, POSPJ.iml, README.md가 있습니다. 
-GitHub
 
 빠른 실행
 1) 사전 준비
 
 JDK 17+ 설치
 
-(선택) Oracle/MySQL 등 DB 준비 및 JDBC 드라이버 추가
+Oracle/MySQL 등 DB 준비 및 JDBC 드라이버 추가
 
 2) 환경 변수/설정 (예시)
 
 src/pos/util/DBConnect.java 또는 설정 파일에 아래와 같이 입력합니다.
 (클래스/경로명은 실제 코드에 맞게 수정)
-
+```prperties
 DB_URL=jdbc:oracle:thin:@localhost:1521/XEPDB1
 DB_USER=pos
 DB_PASSWORD=pos1234
@@ -80,7 +77,7 @@ DB_PASSWORD=pos1234
 WAGE_PER_HOUR=11000
 BLOCK_EXPIRED_ITEMS=true
 ADULT_CHECK_ENABLED=true
-
+```
 3) 빌드 & 실행
 
 IntelliJ: Main 클래스 실행
