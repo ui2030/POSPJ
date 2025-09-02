@@ -5,7 +5,7 @@ POSPJ – 콘솔 기반 POS 시스템 (Java)
 
 🔧 시연 영상·포트폴리오 링크 :
 
-[프론트 & DB 시연](https://youtu.be/-tcM71P1sJ0)
+[프론트 & DB 시연](https://youtu.be/4ozVGK_rUEI)
 [회원가입 생성 시연](https://youtu.be/_yvdUsxaZK4)
 
 주요 기능
