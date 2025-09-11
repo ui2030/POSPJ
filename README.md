@@ -78,7 +78,7 @@ WAGE_PER_HOUR=11000
 BLOCK_EXPIRED_ITEMS=true
 ADULT_CHECK_ENABLED=true
 ```
-## 3) 빌드 & 실행
+### 3) 빌드 & 실행
 
 **ㆍ**IntelliJ: Main 클래스 실행
 
