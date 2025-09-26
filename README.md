@@ -220,7 +220,7 @@ INSERT INTO POSUser (
 )
 ```
 
-## 사용 흐름(예)
+## 사용 흐름
 
 **1.** 직원 로그인 → 근무 시작
 
@@ -232,7 +232,7 @@ INSERT INTO POSUser (
 
 **5.** 근무 종료 → 근무시간 × 시급 = 일급 정산
 
-## 성인 판별 로직(예)
+## 성인 판별 로직
 ```
 boolean isAdult(LocalDate birth, LocalDate today) {
     return Period.between(birth, today).getYears() >= 19;
