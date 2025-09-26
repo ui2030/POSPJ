@@ -260,7 +260,7 @@ boolean isAdult(LocalDate birth, LocalDate today) {
 
 **ㆍ**🔧 Maintainer: Cheonui Kim / kimcjsdml@gmail.com
 
-**ㆍ**저장소: https://github.com/ui2030/POSPJ
+**ㆍ**🔧 저장소: https://github.com/ui2030/POSPJ
 
 ## 참고
  
